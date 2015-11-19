@@ -12,6 +12,9 @@ class UserSearchForm(Form):
 
 class UserModForm(Form):
     banned = BooleanField(u'封禁该用户')
+    user = BooleanField(u'会员')
+    manager = BooleanField(u'内容管理员')
+    s_manager = BooleanField(u'权限管理员')
     submit = SubmitField(u'设置')
 
 

@@ -25,8 +25,8 @@ class User_Role_Relation(db.Model):
     role_id = db.Column(db.Integer,db.ForeignKey('roles.id'),
                     primary_key=True)
     operate_id = db.Column(db.Integer,db.ForeignKey('users.id'),
-                    unique=True)
-    operate_time = db.Column(db.DateTime,default=datetime.utcnow)
+                    nullable=True)
+    operate_time = db.Column(db.DateTime,default=datetime.utcnow,index=True)
 
 
 class User(db.Model,UserMixin):
@@ -35,6 +35,8 @@ class User(db.Model,UserMixin):
     username = db.Column(db.String(50),unique=True,nullable=False)
     email = db.Column(db.String(80),unique=True,nullable=False)
     password_hash = db.Column(db.String(100),nullable=False)
+    picture_format = db.Column(db.String(20))
+    about_me = db.Column(db.UnicodeText)
     confirmed = db.Column(db.Boolean,default=False)
     register_time = db.Column(db.DateTime(),default=datetime.utcnow)
     last_login_time = db.Column(db.DateTime(),default=datetime.utcnow)

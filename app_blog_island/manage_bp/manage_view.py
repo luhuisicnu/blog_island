@@ -1,10 +1,11 @@
 #coding:utf-8
 from flask import redirect, url_for, render_template, flash
-from flask.ext.login import login_required
+from flask.ext.login import login_required, current_user
 from . import manage
 from ..decorators import permission_required
 from ..models import Permission, Role, User, User_Role_Relation, db
-from .manage_form import UserSearchForm, UserModForm, RoleChooseForm, RoleModForm
+from .manage_form import UserSearchForm, UserModForm, \
+         RoleChooseForm, RoleModForm
 
 
 @manage.route('/user_search',methods=['GET','POST'])
@@ -30,14 +31,57 @@ def user_search():
 def user_mod(id):
     form = UserModForm()
     user = User.query.get(int(id))
+    role_user = Role.query.filter_by(rolename='User').first()
+    role_manager = Role.query.filter_by(rolename='Manager').first()
+    role_s_manager = Role.query.filter_by(rolename='S_Manager').first()
+    row_user = User_Role_Relation.query.filter_by(user_id=user.id).\
+                        filter_by(role_id=role_user.id).first()
+    row_manager = User_Role_Relation.query.filter_by(user_id=user.id).\
+                        filter_by(role_id=role_manager.id).first()
+    row_s_manager = User_Role_Relation.query.filter_by(user_id=user.id).\
+                        filter_by(role_id=role_s_manager.id).first()
     if form.validate_on_submit():
+        if not form.user.data and not form.manager.data\
+                 and not form.s_manager.data:
+            flash(u'一个用户至少具有一个角色')
+            return redirect(url_for('manage.user_mod',id=user.id))
+        if form.user.data:
+            if row_user is None:
+                row_user = User_Role_Relation(user_id=user.id,role_id=role_user.id,
+                                        operate_id=current_user.id)
+                db.session.add(row_user)
+        else:
+            if row_user is not None:
+                db.session.delete(row_user)
+        #------------------------------------------
+        if form.manager.data:
+            if row_manager is None:
+                row_manager = User_Role_Relation(user_id=user.id,role_id=role_manager.id,
+                                        operate_id=current_user.id)
+                db.session.add(row_manager)
+        else:
+            if row_manager is not None:
+                db.session.delete(row_manager)
+        #------------------------------------------
+        if form.s_manager.data:
+            if row_s_manager is None:
+                row_s_manager = User_Role_Relation(user_id=user.id,role_id=role_s_manager.id,
+                                        operate_id=current_user.id)
+                db.session.add(row_s_manager)
+        else:
+            if row_s_manager is not None:
+                db.session.delete(row_s_manager)
+        #------------------------------------------
         user.banned = form.banned.data
         if not user.banned:
             user.ask_for_lift_ban = False
         db.session.add(user)
         flash(u'修改已生效')
-        redirect(url_for('manage.user_mod',id=user.id))
+        return redirect(url_for('manage.user_mod',id=user.id))
     form.banned.data = user.banned
+    form.user.data = row_user is not None 
+    form.manager.data = row_manager is not None
+    form.s_manager.data = row_s_manager is not None
     return render_template('manage/user_mod.html',user=user,form=form)
 
 
@@ -55,7 +99,7 @@ def role_choose():
             flash(u'不能对管理员角色执行该操作')
             return redirect(url_for('manage.role_choose'))
         return redirect(url_for('manage.role_mod',id=role.id)) 
-    roles = Role.query.all()
+    roles = Role.query.filter(Role.rolename != 'Administrator').all()
     return render_template('manage/role_choose.html',form=form,roles=roles)
 
 
@@ -97,4 +141,3 @@ def role_mod(id):
     return render_template('manage/role_mod.html',form=form,role=role)
 
 
-#@manage.route('permission')

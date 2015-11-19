@@ -1,7 +1,8 @@
 #coding:utf-8
+import os
 from urllib import quote
 from flask import flash, url_for, redirect, render_template, request,\
-     current_app
+     current_app, session, make_response
 from flask.ext.login import login_user,logout_user, login_required,\
      current_user
 from . import auth
@@ -25,7 +26,9 @@ def login():
             return render_template('auth/login.html',form=form)
         login_user(user,form.remember_me.data)
         flash(u'登录成功')
-        return redirect(request.args.get('next') or url_for('main.index'))
+        response = make_response(redirect(request.args.get('next') or url_for('main.index')))
+        response.set_cookie('user_id',str(user.id))
+        return response
     return render_template('auth/login.html',form=form)
         
             
@@ -34,7 +37,9 @@ def login():
 def logout():
     logout_user()
     flash(u'退出登录成功')
-    return redirect(url_for('main.index'))
+    response = make_response(redirect(url_for('main.index')))
+    response.delete_cookie('user_id')
+    return response
 
 
 @auth.route('/register',methods=['GET','POST'])
@@ -46,14 +51,25 @@ def register():
                        password=form.password.data)    
         db.session.add(user)
         db.session.commit()
-        ship = User_Role_Relation(user_id=user.id,
-            role_id=Role.query.filter_by(rolename='User').first().id,operate_id=user.id)
+        if form.email.data == os.environ['BLOG_ISLAND_MAIL_USERNAME']:
+            ship = User_Role_Relation(user_id=user.id,
+                role_id=Role.query.filter_by(rolename='Administrator').first().id,operate_id=user.id)
+        else:
+            ship = User_Role_Relation(user_id=user.id,
+                role_id=Role.query.filter_by(rolename='User').first().id,operate_id=user.id)
         db.session.add(ship)
         token = user.generate_confirmation_token()
         send_email(form.email.data,u'新账户邮件认证','auth/email/confirm',user=user,token=token)
         flash(u'注册已完成，已发送一封认证邮件到您的邮箱中')
         return redirect(url_for('main.index'))
     return render_template('auth/register.html',form=form)
+
+
+@auth.before_app_request
+def keep_live():
+    user_id = request.cookies.get('user_id',None)
+    if not current_user.is_authenticated and user_id is not None:
+        login_user(User.query.get(int(user_id)))
 
 
 @auth.before_app_request
