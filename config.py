@@ -4,7 +4,7 @@ from app_blog_island.models import Permission
 
 
 class config(object):
-    SQLALCHEMY_DATABASE_URI = "mysql://blog:l315474244@localhost/blog_island"
+    SQLALCHEMY_DATABASE_URI = "mysql://blog:1111@localhost/blog_island"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True   #do "db.session.commit()" after every request
     SECRET_KEY = "blog island's secret key"
