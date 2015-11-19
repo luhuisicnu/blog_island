@@ -1,0 +1,8 @@
+<p>亲爱的 {{ user.username }},</p>
+<p>感谢使用 <b>博客岛</b>!</p>
+<p>进行修改邮件认证请 <a href="{{ url_for('auth.confirm_reset_email', token=token, _external=True) }}">点击我</a>.</p>
+<p>如果点击后无法跳转到邮件认证页面，请复制下面的链接到浏览器地址栏中打开：</p>
+<p>{{ url_for('auth.confirm_reset_email', token=token, _external=True) }}</p>
+<p>祝您愉快！</p>
+<p>博客岛运营团队</p>
+<p><small>注意：该邮件不必回复。</small></p>

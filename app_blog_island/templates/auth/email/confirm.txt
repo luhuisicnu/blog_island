@@ -1,0 +1,7 @@
+亲爱的 {{ user.username }},
+欢迎加入博客岛
+为了保证重要通知能送达给您，需要进行邮件认证，请点击下面的链接进行认证：
+{{ url_for('auth.confirm', token=token, _external=True) }}
+祝您愉快！
+博客岛运营团队
+注意：此邮件不必回复。

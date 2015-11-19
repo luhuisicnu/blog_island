@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}个人主页{% endblock %}
+{% block page_content %}
+<h3>
+    {{ user.username }}的个人主页
+    {% if user.verify_permission(Permission.ADMINISTRATOR) %}[Admin]{% endif %}
+    {% if user.banned %}
+        [被封禁用户]
+        {% if current_user == user %}
+            {% if not user.ask_for_lift_ban and current_user == user %}
+                <a href="{{ url_for('auth.ask_for_lift_ban') }}">申请解封</a>
+            {% else %}
+                已申请解封
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</h3>
+<small>注册时间：{{ moment(user.register_time).format('LLL') }},
+  最近一次登录时间：{{ moment(user.last_login_time).fromNow() }}</small>
+{% endblock %}

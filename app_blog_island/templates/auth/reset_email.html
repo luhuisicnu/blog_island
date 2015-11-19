@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}修改邮箱{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block page_content %}
+    <h3 align="center">修改邮箱 - 博客岛</h3>
+    <div class="authform">
+        {{ wtf.quick_form(form) }}
+    </div>
+{% endblock %}

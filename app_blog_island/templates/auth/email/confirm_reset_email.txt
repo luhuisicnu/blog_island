@@ -1,0 +1,7 @@
+亲爱的 {{ user.username }},
+感谢使用博客岛!
+进行修改邮件认证请点击下面的链接：
+{{ url_for('auth.confirm_reset_email', token=token, _external=True) }}
+祝您愉快！
+博客岛运营团队
+注意：该邮件不必回复。
