@@ -84,7 +84,7 @@ def before_request():
 @auth.route('/unconfirmed',methods=['GET'])
 def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
-        return redirect(url_for('home.home',id=current_user.id))
+        return redirect(url_for('home.homepage',id=current_user.id))
     return render_template('auth/unconfirmed.html')
 
 
@@ -126,7 +126,7 @@ def reset_username():
             return redirect(url_for('auth.reset_username'))
         current_user.username = form.name.data
         db.session.add(current_user)
-        return redirect(url_for('home.home',id=current_user.id))
+        return redirect(url_for('home.homepage',id=current_user.id))
     form.name.data = current_user.username
     return render_template('auth/reset_username.html',form=form)
 
@@ -148,7 +148,7 @@ def reset_email():
         send_email(form.email.data,u'重置邮箱确认',
                   'auth/email/confirm_reset_email',user=current_user,token=token)
         flash(u'已发送一封修改邮箱确认邮件到您的邮箱')
-        return redirect(url_for('home.home',id=current_user.id))
+        return redirect(url_for('home.homepage',id=current_user.id))
     form.email.data = current_user.email
     return render_template('auth/reset_email.html',form=form)
 
@@ -161,7 +161,7 @@ def confirm_reset_email(token):
         flash(u'修改邮箱成功')
     else:
         flash(u'过期或者无效的链接')
-    return redirect(url_for('home.home',id=current_user.id))
+    return redirect(url_for('home.homepage',id=current_user.id))
     
 
 @auth.route('/reset_password',methods=['GET','POST'])
@@ -176,7 +176,7 @@ def reset_password():
         current_user.password = form.password1.data
         db.session.add(current_user)
         flash(u'修改密码成功')
-        return redirect(url_for('home.home',id=current_user.id))
+        return redirect(url_for('home.homepage',id=current_user.id))
     return render_template('auth/reset_password.html',form=form)
 
 
@@ -213,4 +213,4 @@ def ask_for_lift_ban():
     flash(u'申请解封成功，三个工作日内将处理，请耐心等待，超出日期未处理，请到投诉反馈区提出意见')
     current_user.ask_for_lift_ban = True
     db.session.add(current_user)
-    return redirect(url_for('home.home',id=current_user.id))
+    return redirect(url_for('home.homepage',id=current_user.id))

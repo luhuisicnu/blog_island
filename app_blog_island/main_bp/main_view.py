@@ -12,7 +12,7 @@ def index():
 
 
 @main.app_errorhandler(403)
-def page_not_found(e):
+def permission_denied(e):
     return render_template('403.html'),403
 
 
@@ -21,8 +21,13 @@ def page_not_found(e):
     return render_template('404.html'),404
 
 
+@main.app_errorhandler(413)
+def file_too_large(e):
+    return render_template('413.html'),413
+
+
 @main.app_errorhandler(500)
-def page_not_found(e):
+def server_error(e):
     return render_template('500.html'),500
 
 
@@ -40,10 +45,3 @@ def for_moderators_only():
     return "For user!"
 
 
-@main.route('/session')
-def ss():
-    if 'username' in session:
-        resp = 'Welcome %s!' % session['username']
-    else:
-        resp = 'no session'
-    return str(session['_id'])

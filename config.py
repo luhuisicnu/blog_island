@@ -14,5 +14,11 @@ class config(object):
     MAIL_PASSWORD = os.environ['BLOG_ISLAND_MAIL_PASSWORD']
     BLOG_ISLAND_MAIL_SUBJECT_PREFIX = '[博客岛]'
     BLOG_ISLAND_MAIL_SENDER = os.environ['BLOG_ISLAND_MAIL_SENDER']
+    APP_PATH = '/root/blog_island'
+    MAX_CONTENT_LENGTH = 2 * 1024 * 1024   #max upload file Bytes
+
     
-jinja_environment = {'str':str,'Permission':Permission}
+jinja_environment = {
+            'str':str,
+            'Permission':Permission,
+}

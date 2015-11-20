@@ -35,7 +35,8 @@ class User(db.Model,UserMixin):
     username = db.Column(db.String(50),unique=True,nullable=False)
     email = db.Column(db.String(80),unique=True,nullable=False)
     password_hash = db.Column(db.String(100),nullable=False)
-    picture_format = db.Column(db.String(20))
+    picture_url = db.Column(db.String(120))
+    picture_disabled = db.Column(db.Boolean,default=False)
     about_me = db.Column(db.UnicodeText)
     confirmed = db.Column(db.Boolean,default=False)
     register_time = db.Column(db.DateTime(),default=datetime.utcnow)
@@ -168,13 +169,16 @@ class Role(db.Model):
 class AnonymousUser(AnonymousUserMixin):
     def verify_permission(self,permission=0x00):
         return False
+    def is_active():
+        return False
+
+
+login_manager.anonymous_user = AnonymousUser
+
 
 @login_manager.user_loader
 def load_user(userid):
     return User.query.get(int(userid))
-
-
-login_manager.anonymous_user = AnonymousUser
 
 
 def init_db():

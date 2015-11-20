@@ -34,7 +34,7 @@
             <a href="{{ url_for('auth.forget_password_sendemail') }}">忘记密码？</a>
         {% else %}
             <a href="{{ url_for('auth.logout') }}">退出</a>
-            <a href="{{ url_for('home.home',id=current_user.id) }}">个人主页</a>
+            <a href="{{ url_for('home.homepage',id=current_user.id) }}">个人主页</a>
             {% if not current_user.banned %}
                 <a href="{{ url_for('auth.reset_username') }}">修改用户名</a> 
                 <a href="{{ url_for('auth.reset_email') }}">修改邮箱</a> 
