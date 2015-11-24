@@ -4,7 +4,7 @@ from flask import flash, url_for, redirect, render_template, abort,\
         request, current_app
 from flask.ext.login import login_required, current_user
 from . import home
-from .home_form import FileUploadForm
+from .home_form import FileUploadForm, AboutMeForm
 from ..models import User, Role, Permission, db
 from ..decorators import permission_required
 from ..functions import random_str
@@ -57,7 +57,7 @@ def disable_picture(id):
         flash(u'只能禁用其他用户的头像')
         return redirect(url_for('home.homepage',id=current_user.id))
     if user.verify_permission():
-        flash(u'不能管理员的头像')
+        flash(u'不能禁用管理员的头像')
         return redirect(url_for('home.homepage',id=user.id))
     if not user.picture_disabled:
         user.picture_disabled = True
@@ -81,3 +81,51 @@ def able_picture(id):
         db.session.add(user)
     return redirect(url_for('home.homepage',id=user.id))
     
+
+@home.route('/edit_about_me',methods=['GET','POST'])
+@login_required
+@permission_required(Role.User)
+def edit_about_me():
+    form = AboutMeForm()
+    if form.validate_on_submit():
+        current_user.about_me = form.about_me.data
+        return redirect(url_for('home.homepage',id=current_user.id))
+    form.about_me.data = current_user.about_me
+    return render_template('home/edit_about_me.html',user=current_user,form=form)
+
+
+@home.route('/disable_about_me/<id>',methods=['GET'])
+@login_required
+@permission_required(Role.Manager)
+def disable_about_me(id):
+    user = User.query.get(int(id))
+    if user is None:
+        flash(u'不存在的用户')
+        return redirect(url_for('home.homepage',id=current_user.id))
+    if current_user.id == user.id:
+        flash(u'只能禁用其他用户的个人简介')
+        return redirect(url_for('home.homepage',id=current_user.id))
+    if user.verify_permission():
+        flash(u'不能禁用管理员的个人简介')
+        return redirect(url_for('home.homepage',id=user.id))
+    if not user.about_me_disabled:
+        user.about_me_disabled = True
+        db.session.add(user)
+    return redirect(url_for('home.homepage',id=user.id))
+        
+        
+@home.route('/able_about_me/<id>',methods=['GET'])
+@login_required
+@permission_required(Role.Manager)
+def able_about_me(id):
+    user = User.query.get(int(id))
+    if user is None:
+        flash(u'不存在的用户')
+        return redirect(url_for('home.homepage',id=current_user.id))
+    if current_user.id == user.id:
+        flash(u'只能启用其他用户的个人简介')
+        return redirect(url_for('home.homepage',id=current_user.id))
+    if user.about_me_disabled:
+        user.about_me_disabled = False
+        db.session.add(user)
+    return redirect(url_for('home.homepage',id=user.id))

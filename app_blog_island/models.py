@@ -38,6 +38,7 @@ class User(db.Model,UserMixin):
     picture_url = db.Column(db.String(120))
     picture_disabled = db.Column(db.Boolean,default=False)
     about_me = db.Column(db.UnicodeText)
+    about_me_disabled = db.Column(db.Boolean,default=False)
     confirmed = db.Column(db.Boolean,default=False)
     register_time = db.Column(db.DateTime(),default=datetime.utcnow)
     last_login_time = db.Column(db.DateTime(),default=datetime.utcnow)

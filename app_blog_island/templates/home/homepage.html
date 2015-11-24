@@ -31,10 +31,24 @@
 </a>
 {% endif %}
 <p>
-{% if user.about_me %}
+{% if user.about_me and not user.about_me_disabled %}
     {{ user.about_me }}
 {% endif %}
+{% if user.about_me_disabled %}
+    <p>已禁用的个人简介，解禁请联系管理员</p>
+{% endif %}
 </p>
+{% if current_user.id == user.id %}
+    <a href="{{ url_for('home.edit_about_me') }}">编辑</a>
+{% endif %}
+{% if current_user.id != user.id and not user.verify_permission() and current_user.verify_permission(Permission.MANAGE_HOMEPAGE) %}
+    {% if not user.about_me_disabled %}
+        <a href="{{ url_for('home.disable_about_me',id=user.id) }}">禁用个人简介</a>
+    {% else %}
+        <a href="{{ url_for('home.able_about_me',id=user.id) }}">启用个人简介</a>
+    {%endif%}
+    <br />
+{%endif%}
 <br />
 <br />
 <br />
