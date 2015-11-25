@@ -41,5 +41,8 @@ def create_app(config_name,jinja_environment):
     from .manage_bp import manage
     app.register_blueprint(manage,url_prefix='/manage')
 
+    from .blog_bp import blog
+    app.register_blueprint(blog,url_prefix='/blog')
+
     return app
 

@@ -4,7 +4,7 @@
     <title>{% block title %}{% endblock %} - 博客岛</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    <style>
+    <style type="text/css">
         .authform {
             max-width: 300px;
             padding: 19px 29px 29px;
@@ -38,11 +38,22 @@
             margin-bottom: 15px;
             padding: 7px 9px;
         }
+        .baseform {
+            max-width: 1200px;
+            background-color: #FFFFFF;
+            border-style: groove;
+            border-color: transparent;
+            margin: 30px auto 30px auto;
+        }
+        .daohang {
+            border-style: outside;
+            margin: 5px 50px 5px 50px
+        }
     </style>
 {% endblock %}
 {% block content %}
 <div>
-    <div>
+    <div class="daohang">
         <a href="{{ url_for('main.index') }}">博客岛</a>
         {% if not current_user.is_authenticated %}
             <a href="{{ url_for('auth.register') }}">注册</a>
@@ -55,6 +66,7 @@
                 <a href="{{ url_for('auth.reset_username') }}">修改用户名</a> 
                 <a href="{{ url_for('auth.reset_email') }}">修改邮箱</a> 
                 <a href="{{ url_for('auth.reset_password') }}">修改密码</a> 
+                <a href="{{ url_for('blog.new_article') }}">新建博客文章</a> 
             {% endif %}
             {% if current_user.verify_permission(Permission.MANAGE_AUTH) %}
                 <a href="{{ url_for('manage.user_search') }}">用户管理</a> 
@@ -68,7 +80,9 @@
         {{ message }}
     </div>
     {% endfor %}
+    <div class="baseform">
     {% block page_content %}{% endblock %}
+    </div>
 </div>
 {% endblock %}
 {% block scripts%}

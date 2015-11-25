@@ -5,4 +5,5 @@
 {% endblock %}
 {% block page_content %}
 <h3>欢迎来到博客岛！{% if current_user.is_authenticated %}{{ current_user.username }}{% endif %}</h3>
+<a href="{{ url_for('blog.show_articles') }}">所有博文</a>
 {% endblock %}

@@ -29,6 +29,18 @@ class User_Role_Relation(db.Model):
     operate_time = db.Column(db.DateTime,default=datetime.utcnow,index=True)
 
 
+class Article(db.Model):
+    __tablename__ = 'articles'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    subject = db.Column(db.String(128),nullable=False)
+    body =  db.Column(db.UnicodeText,nullable=False)
+    digest = db.Column(db.UnicodeText,nullable=False)
+    disabled = db.Column(db.Boolean,default=False)
+    publish_time = db.Column(db.DateTime,default=datetime.utcnow,index=True)
+    edit_time = db.Column(db.DateTime,default=datetime.utcnow)
+
+
 class User(db.Model,UserMixin):
     __tablename__ = "users"
     id = db.Column(db.Integer,primary_key=True)
@@ -46,6 +58,8 @@ class User(db.Model,UserMixin):
         lazy='dynamic',foreign_keys=[User_Role_Relation.user_id])
     operate_role_relation = db.relationship('User_Role_Relation',backref='operater',
         lazy='dynamic',foreign_keys=[User_Role_Relation.operate_id])
+    article = db.relationship('Article',backref='user',
+        lazy='dynamic',foreign_keys=[Article.user_id])
     banned = db.Column(db.Boolean,default=False)
     ask_for_lift_ban = db.Column(db.Boolean,default=False)
 

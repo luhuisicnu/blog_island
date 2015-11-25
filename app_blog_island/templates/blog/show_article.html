@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}查看博客文章{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block page_content %}
+    <h3 align="center">查看博客文章 - 博客岛</h3>
+    <h2>{{ article.subject }}</h2>
+    {% if current_user.id == article.user.id and current_user.verify_permission(Permission.WRITE_ARTICLES) %}
+        <a href="{{ url_for('blog.edit_article',id=article.id) }}">编辑</a>
+        <br />
+    {% endif %}
+    <p align="right">
+    <small>创建于{{ moment(article.publish_time).format('LLL')}}</small>
+    <small>最近编辑于{{ moment(article.edit_time).format('LLL')}}</small>
+    </p>
+    <i>{{ article.digest|safe }}</i>
+    <div>
+        {{ article.body|safe }}
+    </div>
+{% endblock %}

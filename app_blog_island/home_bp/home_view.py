@@ -5,7 +5,7 @@ from flask import flash, url_for, redirect, render_template, abort,\
 from flask.ext.login import login_required, current_user
 from . import home
 from .home_form import FileUploadForm, AboutMeForm
-from ..models import User, Role, Permission, db
+from ..models import User, Role, Permission, db, Article
 from ..decorators import permission_required
 from ..functions import random_str
 
@@ -15,7 +15,13 @@ def homepage(id):
     user = User.query.filter_by(id=id).first()
     if user is None:
         abort(404)
-    return render_template('home/homepage.html',user=user)
+    page = request.args.get('page', 1, type=int)
+    pagination = user.article.order_by(Article.publish_time.desc()).paginate(
+        page, per_page=current_app.config['BLOG_ISLAND_ARTICLES_PER_PAGE'],
+        error_out=False)
+    articles = pagination.items
+    return render_template('home/homepage.html', user=user, articles=articles,
+            pagination=pagination)
 
 
 @home.route('/upload_picture',methods=['GET','POST'])

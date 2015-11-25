@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}编辑博客文章{% endblock %}
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static',filename='ckeditor/ckeditor.js') }}"></script>
+{% endblock %}
+{% block page_content %}
+    <h3 align="center">编辑博客文章 - 博客岛</h3>
+    <div class="textform">
+        {{ wtf.quick_form(form) }}
+        <script type="text/javascript">CKEDITOR.replace('body');</script>
+        <script type="text/javascript">CKEDITOR.replace('digest');</script>
+    </div>
+{% endblock %}

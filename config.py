@@ -16,6 +16,7 @@ class config(object):
     BLOG_ISLAND_MAIL_SENDER = os.environ['BLOG_ISLAND_MAIL_SENDER']
     APP_PATH = '/root/blog_island'
     MAX_CONTENT_LENGTH = 2 * 1024 * 1024   #max upload file Bytes
+    BLOG_ISLAND_ARTICLES_PER_PAGE = 3
 
     
 jinja_environment = {
