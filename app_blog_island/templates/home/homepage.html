@@ -63,8 +63,20 @@
     {%endif%}
     <br />
 {%endif%}
+<p>
+    {% if current_user.is_authenticated and current_user.id != user.id %}
+        {% if not current_user.star_relation.filter_by(star_id=user.id).first() %}
+            <a href="{{ url_for('home.follow',id=user.id) }}">关注他/她</a>
+        {% else %}
+            <a href="{{ url_for('home.unfollow',id=user.id) }}">取消关注他/她</a>
+        {% endif %}
+    {% endif %}
+    他/她的粉丝：<a href="{{ url_for('home.show_fans',id=user.id) }}">{{ user.fans_relation.count() - 1 }}</a> 
+    他/她关注：<a href="{{ url_for('home.show_stars',id=user.id) }}">{{ user.star_relation.count() - 1 }}</a>
+</p>
 <small>注册时间：{{ moment(user.register_time).format('LLL') }},
   最近一次登录时间：{{ moment(user.last_login_time).fromNow() }}</small>
+<br />
 {% include "_articles.html" %}
 <div class="pagination">
     {{ macros.pagination_widget(pagination,'.homepage',id=user.id) }}

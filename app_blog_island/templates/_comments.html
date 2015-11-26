@@ -1,0 +1,20 @@
+{% for comment in comments %}
+    <li>
+        <a href="{{ url_for('home.homepage',id=comment.user_id) }}">{{ comment.user.username }}</a>
+        <i>评论于{{ moment(comment.timesamp).format('LLL') }}</i>
+        {% if not comment.disabled %}
+            <p>{{ comment.comment }}</p>
+        {% else %}
+            <p><i>包含不当内容，已封禁</i></p>
+        {% endif %}
+    </li>
+    <div>
+    {% if current_user.verify_permission(Permission.MANAGE_COMMENT) and current_user.id != comment.user.id %}
+        {% if not comment.disabled %}
+            <a href="{{ url_for('blog.disable_comment',id=comment.id) }}">封禁评论</a>
+        {% else %}
+            <a href="{{ url_for('blog.able_comment',id=comment.id) }}">解封评论</a>
+        {% endif %}    
+    {% endif %}
+    </div>
+{% endfor %}

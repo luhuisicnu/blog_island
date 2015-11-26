@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ head }}{% endblock %}
+{% block page_content %}
+<h3 align="center">{{ head }}</h3>
+{% for user in follows %}
+    <li>
+        <a href="{{ url_for('home.homepage',id=user.id) }}">{{ user.username }}</a>
+        <p>{{ user.about_me }}</p>
+    </li>
+{% endfor %}
+{% endblock %}

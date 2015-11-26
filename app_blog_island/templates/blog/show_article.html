@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-
+{% import "_macros.html" as macros %}
 {% block title %}查看博客文章{% endblock %}
 {% block head %}
     {{ super() }}
@@ -12,12 +12,37 @@
         <a href="{{ url_for('blog.edit_article',id=article.id) }}">编辑</a>
         <br />
     {% endif %}
+    {% if current_user.verify_permission(Permission.MANAGE_COMMENT) and current_user.id != article.user.id %}
+        {% if not article.disabled %}
+            <a href="{{ url_for('blog.disable_article',id=article.id) }}">封禁博文</a>
+        {% else %}
+            <a href="{{ url_for('blog.able_article',id=article.id) }}">解封博文</a>
+        {% endif %}
+    {% endif %}
     <p align="right">
     <small>创建于{{ moment(article.publish_time).format('LLL')}}</small>
     <small>最近编辑于{{ moment(article.edit_time).format('LLL')}}</small>
+    <small>访问量：{{ article.page_view }}</small>
     </p>
-    <i>{{ article.digest|safe }}</i>
+    <p><b>摘要：</b></p>
+    {% if not article.disabled %}
+        <i>{{ article.digest|safe }}</i>
+    {% else %}
+        <i>包含不当内容，已封禁</i>
+    {% endif %}
+    <p><b>正文：</b></p>
     <div>
+    {% if not article.disabled %}
         {{ article.body|safe }}
+    {% else %}
+        <i>包含不当内容，已封禁</i>
+    {% endif %}
     </div>
+{% if current_user.is_authenticated and not article.disabled %}
+    {{ wtf.quick_form(form) }}
+{% endif %}
+{% include "_comments.html" %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination,'.show_article',username=article.user.username,id=article.id) }}
+</div>
 {% endblock %}

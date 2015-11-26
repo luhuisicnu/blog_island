@@ -5,5 +5,26 @@
 {% endblock %}
 {% block page_content %}
 <h3>欢迎来到博客岛！{% if current_user.is_authenticated %}{{ current_user.username }}{% endif %}</h3>
-<a href="{{ url_for('blog.show_articles') }}">所有博文</a>
+<p><a href="{{ url_for('blog.show_articles') }}">所有博文</a></p>
+<h4>最新博文</h4>
+{% for article in articles %}
+    <li>
+        <a href="{{ url_for('blog.show_article',username=article.user.username,id=article.id) }}">{{ article.subject }}</a>
+        <i>创建于{{ moment(article.publish_time).format('LLL') }}，访问量{{ article.page_view }}</i>
+        <p>{{ article.digest|safe }}</p>
+    </li>
+{% endfor %}
+<br />
+<br />
+<br />
+<h4>活跃用户</h4>
+{% for user in users %}
+    <li>
+        <a href="{{ url_for('home.homepage',id=user.id) }}">{{ user.username }}</a>
+        {% if user.about_me %}
+            <p>{{ user.about_me }}</p>
+        {% endif %}
+        <p>最近登录于{{ moment(user.last_login_time).format('LLL') }}</p>
+    </li>
+{% endfor %}
 {% endblock %}

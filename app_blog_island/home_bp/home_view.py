@@ -5,7 +5,7 @@ from flask import flash, url_for, redirect, render_template, abort,\
 from flask.ext.login import login_required, current_user
 from . import home
 from .home_form import FileUploadForm, AboutMeForm
-from ..models import User, Role, Permission, db, Article
+from ..models import User, Role, Permission, db, Article, Follow
 from ..decorators import permission_required
 from ..functions import random_str
 
@@ -135,3 +135,64 @@ def able_about_me(id):
         user.about_me_disabled = False
         db.session.add(user)
     return redirect(url_for('home.homepage',id=user.id))
+
+
+@home.route('/follow/<int:id>',methods=['GET'])
+@login_required
+@permission_required(Permission.FOLLOW)
+def follow(id):
+    user = User.query.get_or_404(int(id))
+    fans = Follow.query.filter_by(star_id=user.id).\
+                        filter_by(fans_id=current_user.id).first()
+    if fans is None:
+        fans = Follow(star_id=user.id,fans_id=current_user.id)
+        db.session.add(fans)
+        flash(u'关注成功')
+    else:
+        flash(u'不能重复关注')
+    return redirect(url_for('home.homepage',id=user.id))
+
+
+@home.route('/unfollow/<int:id>',methods=['GET'])
+@login_required
+@permission_required(Permission.FOLLOW)
+def unfollow(id):
+    user = User.query.get_or_404(int(id))
+    fans = Follow.query.filter_by(star_id=user.id).\
+                        filter_by(fans_id=current_user.id).first()
+    if fans is not None:
+        db.session.delete(fans)
+        flash(u'取消关注成功')
+    else:
+        flash(u'不能对未关注的用户取消关注')
+    return redirect(url_for('home.homepage',id=user.id))
+
+
+@home.route('/<int:id>/stars',methods=['GET'])
+def show_stars(id):
+    user = User.query.get_or_404(int(id))
+    stars = []
+    for star_relationship in user.star_relation.all():
+        star = star_relationship.star
+        if user.id != star.id:
+            stars.append(star)
+    if not stars:
+        flash(u'该用户未关注其他用户')
+        return redirect(url_for('home.homepage',id=user.id))
+    return render_template('home/follow.html',head=user.username + u'关注的人',follows=stars)
+
+
+@home.route('/<int:id>/fans',methods=['GET'])
+def show_fans(id):
+    user = User.query.get_or_404(int(id))
+    fans = []
+    for fan_relationship in user.fans_relation.all():
+        fan = fan_relationship.fans
+        if user.id != fan.id:
+            fans.append(fan)
+    if fans == []:
+        flash(u'该用户还没有被关注')
+        return redirect(url_for('home.homepage',id=user.id))
+    return render_template('home/follow.html',head=user.username + u'的粉丝',follows=fans)
+
+

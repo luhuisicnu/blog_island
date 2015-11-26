@@ -29,6 +29,16 @@ class User_Role_Relation(db.Model):
     operate_time = db.Column(db.DateTime,default=datetime.utcnow,index=True)
 
 
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    article_id = db.Column(db.Integer, db.ForeignKey('articles.id'))
+    comment = db.Column(db.String(300),nullable=False)
+    timesamp = db.Column(db.DateTime,default=datetime.utcnow)
+    disabled = db.Column(db.Boolean,default=False)
+
+
 class Article(db.Model):
     __tablename__ = 'articles'
     id = db.Column(db.Integer, primary_key=True)
@@ -36,9 +46,21 @@ class Article(db.Model):
     subject = db.Column(db.String(128),nullable=False)
     body =  db.Column(db.UnicodeText,nullable=False)
     digest = db.Column(db.UnicodeText,nullable=False)
+    page_view = db.Column(db.Integer, default=0)
     disabled = db.Column(db.Boolean,default=False)
     publish_time = db.Column(db.DateTime,default=datetime.utcnow,index=True)
     edit_time = db.Column(db.DateTime,default=datetime.utcnow)
+    comment = db.relationship('Comment',backref='article',
+        lazy='dynamic',foreign_keys=[Comment.article_id])
+
+
+class Follow(db.Model):
+    __tablename__ = 'follow_relation'
+    star_id = db.Column(db.Integer,db.ForeignKey('users.id'),
+                    primary_key=True)
+    fans_id = db.Column(db.Integer,db.ForeignKey('users.id'),
+                    primary_key=True)
+    timesamp = db.Column(db.DateTime,default=datetime.utcnow,index=True)
 
 
 class User(db.Model,UserMixin):
@@ -60,6 +82,12 @@ class User(db.Model,UserMixin):
         lazy='dynamic',foreign_keys=[User_Role_Relation.operate_id])
     article = db.relationship('Article',backref='user',
         lazy='dynamic',foreign_keys=[Article.user_id])
+    star_relation = db.relationship('Follow',backref='fans',lazy='dynamic',foreign_keys=[Follow.fans_id],
+        cascade='all, delete-orphan')
+    fans_relation = db.relationship('Follow',backref='star',lazy='dynamic',foreign_keys=[Follow.star_id],
+        cascade='all, delete-orphan')
+    comment = db.relationship('Comment',backref='user',
+        lazy='dynamic',foreign_keys=[Comment.user_id])
     banned = db.Column(db.Boolean,default=False)
     ask_for_lift_ban = db.Column(db.Boolean,default=False)
 

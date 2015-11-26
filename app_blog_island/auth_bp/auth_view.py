@@ -8,7 +8,7 @@ from flask.ext.login import login_user,logout_user, login_required,\
 from . import auth
 from .auth_form import LoginForm, RegisterForm, ResetUsernameForm, \
     ResetEmailForm, ResetPasswordForm, ForgetPasswordForm
-from ..models import User, Role, User_Role_Relation, db
+from ..models import User, Role, User_Role_Relation, db, Follow
 from ..email import send_email
 from ..decorators import permission_required
 
@@ -58,6 +58,8 @@ def register():
             ship = User_Role_Relation(user_id=user.id,
                 role_id=Role.query.filter_by(rolename='User').first().id,operate_id=user.id)
         db.session.add(ship)
+        fans = Follow(star_id=user.id,fans_id=user.id)
+        db.session.add(fans)
         token = user.generate_confirmation_token()
         send_email(form.email.data,u'新账户邮件认证','auth/email/confirm',user=user,token=token)
         flash(u'注册已完成，已发送一封认证邮件到您的邮箱中')
