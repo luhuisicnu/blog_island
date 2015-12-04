@@ -1,7 +1,18 @@
 {% for article in articles %}
-    <li>
+    <div>
+    {% if not article.user.picture_disabled %}
+        {% if article.user.picture_url %}
+            <img src="{{ url_for('static',filename=article.user.picture_url) }}" align="left" width="100" height="100" alt="个人头像" />
+        {% else %}
+            <img src="{{ url_for('static',filename='picture/before.jpg') }}" align="left" width="100" height="100" alt="未设置个人头像" />
+        {% endif %}
+    {% else %}
+        <img src="{{ url_for('static',filename='picture/disabled.jpg') }}" align="left" width="100" height="100" alt="已禁用图片" />
+    {% endif %}
+    </div>
+    <div class="clearfix">
         <a href="{{ url_for('blog.show_article',username=article.user.username,id=article.id) }}">{{ article.subject }}</a>
         <i>创建于{{ moment(article.publish_time).format('LLL') }}，访问量{{ article.page_view }}</i>
         <p>{{ article.digest|safe }}</p>
-    </li>
+    </div>
 {% endfor %}

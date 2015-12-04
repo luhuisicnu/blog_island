@@ -11,7 +11,7 @@ from ..models import Permission, Role, Follow, User, db, Article
 def index():
     articles = Article.query.order_by(Article.publish_time.desc()).all()[:5]
     users = User.query.order_by(User.last_login_time.desc()).all()[:5]
-    return render_template('index.html',articles=articles,users=users) 
+    return render_template('index.html') 
 
 
 @main.app_errorhandler(403)
