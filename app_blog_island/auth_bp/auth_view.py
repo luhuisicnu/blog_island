@@ -26,12 +26,14 @@ def login():
             return render_template('auth/login.html',form=form)
         login_user(user,form.remember_me.data)
         flash(u'登录成功')
-        response = make_response(redirect(request.args.get('next') or url_for('main.index')))
-        response.set_cookie('user_id',str(user.id))
-        return response
+        session['user_id'] = user.id
+        return redirect(request.args.get('next') or url_for('main.index'))
+#        response = make_response(redirect(request.args.get('next') or url_for('main.index')))
+#        response.set_cookie('user_id',str(user.id))
+#        return response
     return render_template('auth/login.html',form=form)
-        
-            
+
+
 @auth.route('/logout',methods=['GET'])
 @login_required
 def logout():
@@ -48,7 +50,7 @@ def register():
     if form.validate_on_submit():
         user = User(username=form.name.data,
                        email=form.email.data,
-                       password=form.password.data)    
+                       password=form.password.data)
         db.session.add(user)
         db.session.commit()
         if form.email.data == os.environ['BLOG_ISLAND_MAIL_USERNAME']:
@@ -69,9 +71,11 @@ def register():
 
 @auth.before_app_request
 def keep_live():
-    user_id = request.cookies.get('user_id',None)
+    user_id = session.get('user_id', None)
+#    user_id = request.cookies.get('user_id', None)
     if not current_user.is_authenticated and user_id is not None:
         login_user(User.query.get(int(user_id)))
+
 
 
 @auth.before_app_request
@@ -79,7 +83,7 @@ def before_request():
     if current_user.is_authenticated:
         current_user.active()
         if not current_user.confirmed \
-            and request.endpoint[:5] != 'auth.': 
+            and request.endpoint[:5] != 'auth.':
             return redirect(url_for('auth.unconfirmed'))
 
 
@@ -98,7 +102,7 @@ def resend_confirmation():
                'auth/email/confirm', user=current_user, token=token)
     flash(u'一封新的认证邮件已经发送到您的邮箱')
     return redirect(url_for('main.index'))
-    
+
 
 @auth.route('/confirm/<token>',methods=['GET'])
 @login_required
@@ -164,7 +168,7 @@ def confirm_reset_email(token):
     else:
         flash(u'过期或者无效的链接')
     return redirect(url_for('home.homepage',id=current_user.id))
-    
+
 
 @auth.route('/reset_password',methods=['GET','POST'])
 @login_required
@@ -205,8 +209,8 @@ def forget_password_newpassword(token):
     else:
         flash(u'修改密码成功')
     return redirect(url_for('main.index'))
-        
-        
+
+
 @auth.route('/ask_for_lift_ban')
 @login_required
 def ask_for_lift_ban():

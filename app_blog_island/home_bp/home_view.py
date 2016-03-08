@@ -30,8 +30,8 @@ def homepage(id):
 def upload_picture():
     form = FileUploadForm()
     if form.validate_on_submit():
-        picture_path = '/root/blog_island/app_blog_island/static/picture/'
-        static_path = '/root/blog_island/app_blog_island/static/'
+        picture_path = os.path.join(current_app.root_path, 'static/picture/')
+        static_path = current_app.static_folder
         format = ['png','jpg','jpeg','gif']
         file = request.files['file']    #key 'file' is defined in FileUploadForm
         if file and '.' in file.filename and file.filename.rsplit('.', 1)[1] in format:
